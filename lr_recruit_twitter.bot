@@ -64,16 +64,14 @@ class TwitterBase
   end
 end
 
-class LrRecruit
-end
-
 # MyNaviのテキストを扱うクラス
 # TODO:
 # 「会社説明会」「セミナー（２つ）」を別々のクラスで作る
-class MyNavi < LrRecruit
+class MyNavi
   attr_reader :dates
   attr_reader :times
   attr_reader :prices
+  attr_reader :title
   
   def initialize
     @all_dates  = []
@@ -82,28 +80,42 @@ class MyNavi < LrRecruit
     @dates  = []
     @times  = []
     @prices = []
+    @title  = []
   end
 
   def base_url
-    "http://job.mynavi.jp/11/pc/NSSearchSeminarInfo.do?optNum=k74VXC&corpId=75729"
+    "http://job.mynavi.jp/"
   end
 
   def feed
+    (open_feed.search("h2")).each do |elems|
+      @title << elems.inner_html.toutf8
+    end
+
     (open_feed.search("td.date")).each do |elems|
-        @all_dates << elems
+      @all_dates << elems.inner_html.toutf8
     end
 
     (open_feed.search("td.time")).each do |elems|
-        @all_times << elems
+      @all_times << elems.inner_html.toutf8
     end
 
-    (open_feed.search("td.price")).each do |elems|
-        @all_prices << elems
+    (open_feed.search("td.place")).each do |elems|
+      @all_prices << elems.inner_html.toutf8
     end
   end
 
-  def link
-    "http://job.mynavi.jp/11/pc/NSSearchSeminarInfo.do?optNum=k74VXC&corpId=75729"
+  def filter
+    return self if @all_dates.empty?
+
+# 作りかけ・・
+
+    @all_dates.each_with_index do |date, index|
+      date = ParseDate::parsedate(date)
+
+      if Time.now < Time.local(date[0].to_i, date[0].to_i, date[0].to_i) + interval
+      end
+    end
   end
 
   private
@@ -118,9 +130,17 @@ class MyNavi < LrRecruit
   end
 end
 
-twitter_base = TwitterBase.new
-my_navi      = MyNavi.new
-my_navi.feed
+# 会社説明会
+class BriefingSession < MyNavi
+  def base_url
+    "http://job.mynavi.jp/11/pc/NSSearchSeminarInfo.do?optNum=4pgO7C&corpId=75729"
+  end
+end
+
+twitter_base     = TwitterBase.new
+briefing_session = BriefingSession.new
+briefing_session.feed
+briefing_session.filter
 
 #my_navi.adc_maintenance_news_feed
 #my_navi.titles.each_with_index do |title, index|
