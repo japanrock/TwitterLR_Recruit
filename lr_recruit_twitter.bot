@@ -108,12 +108,16 @@ class MyNavi
   def filter
     return self if @all_dates.empty?
 
-# 作りかけ・・
-
     @all_dates.each_with_index do |date, index|
       date = ParseDate::parsedate(date)
 
-      if Time.now < Time.local(date[0].to_i, date[0].to_i, date[0].to_i) + interval
+      if date[0]
+        time = Time.now
+        # 10日先ジャストの告知取得
+        if interval == (Time.local(date[0].to_i, date[1].to_i, date[2].to_i) - Time.local(time.year, time.month, time.day)).divmod(24*60*60)[0]
+          @dates  << @all_dates[index] 
+          @times  << @all_times[index]
+        end
       end
     end
   end
@@ -124,9 +128,9 @@ class MyNavi
     Hpricot(open(base_url))
   end
 
-  # 実行からどのくらい前までのフィードを取得するか
+  # days
   def interval
-    60 * 60 * 24 * 10
+    10
   end
 end
 
@@ -135,6 +139,10 @@ class BriefingSession < MyNavi
   def base_url
     "http://job.mynavi.jp/11/pc/NSSearchSeminarInfo.do?optNum=4pgO7C&corpId=75729"
   end
+
+  def link
+    base_url
+  end
 end
 
 twitter_base     = TwitterBase.new
@@ -142,7 +150,6 @@ briefing_session = BriefingSession.new
 briefing_session.feed
 briefing_session.filter
 
-#my_navi.adc_maintenance_news_feed
-#my_navi.titles.each_with_index do |title, index|
-#  twitter_base.post(title + " - " + my_navi.link)
-#end
+briefing_session.dates.each_with_index do |date, index|
+  twitter_base.post("#{briefing_session.title}" + " " + "#{briefing_session.dates[index]}" + " " + "#{briefing_session.times[index]}" + " " + "#{briefing_session.link}")
+end
