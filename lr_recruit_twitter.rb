@@ -9,60 +9,16 @@ require 'open-uri'
 require 'yaml'
 require 'parsedate'
 require "kconv"
-
-### TODO:
-### ・TwitterBaseクラスを外に出す
+require File.dirname(__FILE__) + '/twitter_oauth'
 
 # Usage:
-# ruby lr_recruit_twitter.rb /path/to/sercret_keys.yml
-
-# TwitterのAPIとのやりとりを行うクラス
-class TwitterBase
-  def initialize
-    # config.yml内のsercret_keys.ymlをloadします。
-    @secret_keys = YAML.load_file(ARGV[0] || 'sercret_keys.yml')
-  end
-  
-  def consumer_key
-    @secret_keys["ConsumerKey"]
-  end
-
-  def consumer_secret
-    @secret_keys["ConsumerSecret"]
-  end
-
-  def access_token_key
-    @secret_keys["AccessToken"]
-  end
-
-  def access_token_secret
-    @secret_keys["AccessTokenSecret"]
-  end
-
-  def consumer
-    @consumer = OAuth::Consumer.new(
-      consumer_key,
-      consumer_secret,
-      :site => 'http://twitter.com'
-    )
-  end
-
-  def access_token
-    consumer
-    access_token = OAuth::AccessToken.new(
-      @consumer,
-      access_token_key,
-      access_token_secret
-    )
-  end
-
-  def post(tweet=nil)
-    response = access_token.post(
-      'http://twitter.com/statuses/update.json',
-      'status'=> tweet
-    )
-  end
-end
+#  1. このファイルと同じディレクトリに以下2つのファイルを設置します。
+#   * twitter_oauth.rb
+#   * http://github.com/japanrock/TwitterTools/blob/master/twitter_oauth.rb
+#   * sercret_key.yml
+#   * http://github.com/japanrock/TwitterTools/blob/master/secret_keys.yml.example
+#  2. このファイルを実行します。
+#   ruby lr_recruit_twitter.rb
 
 # MyNaviのテキストを扱うクラス
 # TODO:
@@ -145,11 +101,11 @@ class BriefingSession < MyNavi
   end
 end
 
-twitter_base     = TwitterBase.new
+twitter_oauth    = TwitterOauth.new
 briefing_session = BriefingSession.new
 briefing_session.feed
 briefing_session.filter
 
 briefing_session.dates.each_with_index do |date, index|
-  twitter_base.post("#{briefing_session.title}" + " " + "#{briefing_session.dates[index]}" + " " + "#{briefing_session.times[index]}" + " " + "#{briefing_session.link}")
+  twitter_oauth.post("#{briefing_session.title}" + " " + "#{briefing_session.dates[index]}" + " " + "#{briefing_session.times[index]}" + " " + "#{briefing_session.link}")
 end
