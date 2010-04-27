@@ -11,15 +11,15 @@ require 'parsedate'
 require "kconv"
 
 ### TODO:
-### ¡¦TwitterBase¥¯¥é¥¹¤ò³°¤Ë½Ğ¤¹
+### ãƒ»TwitterBaseã‚¯ãƒ©ã‚¹ã‚’å¤–ã«å‡ºã™
 
 # Usage:
 # ruby lr_recruit_twitter.rb /path/to/sercret_keys.yml
 
-# Twitter¤ÎAPI¤È¤Î¤ä¤ê¤È¤ê¤ò¹Ô¤¦¥¯¥é¥¹
+# Twitterã®APIã¨ã®ã‚„ã‚Šã¨ã‚Šã‚’è¡Œã†ã‚¯ãƒ©ã‚¹
 class TwitterBase
   def initialize
-    # config.ymlÆâ¤Îsercret_keys.yml¤òload¤·¤Ş¤¹¡£
+    # config.ymlå†…ã®sercret_keys.ymlã‚’loadã—ã¾ã™ã€‚
     @secret_keys = YAML.load_file(ARGV[0] || 'sercret_keys.yml')
   end
   
@@ -64,9 +64,9 @@ class TwitterBase
   end
 end
 
-# MyNavi¤Î¥Æ¥­¥¹¥È¤ò°·¤¦¥¯¥é¥¹
+# MyNaviã®ãƒ†ã‚­ã‚¹ãƒˆã‚’æ‰±ã†ã‚¯ãƒ©ã‚¹
 # TODO:
-# ¡Ö²ñ¼ÒÀâÌÀ²ñ¡×¡Ö¥»¥ß¥Ê¡¼¡Ê£²¤Ä¡Ë¡×¤òÊÌ¡¹¤Î¥¯¥é¥¹¤Çºî¤ë
+# ã€Œä¼šç¤¾èª¬æ˜ä¼šã€ã€Œã‚»ãƒŸãƒŠãƒ¼ï¼ˆï¼’ã¤ï¼‰ã€ã‚’åˆ¥ã€…ã®ã‚¯ãƒ©ã‚¹ã§ä½œã‚‹
 class MyNavi
   attr_reader :dates
   attr_reader :times
@@ -113,7 +113,7 @@ class MyNavi
 
       if date[0]
         time = Time.now
-        # 10ÆüÀè¥¸¥ã¥¹¥È¤Î¹ğÃÎ¼èÆÀ
+        # 10æ—¥å…ˆã‚¸ãƒ£ã‚¹ãƒˆã®å‘ŠçŸ¥å–å¾—
         if interval == (Time.local(date[0].to_i, date[1].to_i, date[2].to_i) - Time.local(time.year, time.month, time.day)).divmod(24*60*60)[0]
           @dates  << @all_dates[index] 
           @times  << @all_times[index]
@@ -123,7 +123,7 @@ class MyNavi
   end
 
   private
-  # ¥Õ¥£¡¼¥É¤òHpricot¤Î¥ª¥Ö¥¸¥§¥¯¥È¤Ë¤·¤Ş¤¹¡£
+  # ãƒ•ã‚£ãƒ¼ãƒ‰ã‚’Hpricotã®ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã«ã—ã¾ã™ã€‚
   def open_feed
     Hpricot(open(base_url))
   end
@@ -134,7 +134,7 @@ class MyNavi
   end
 end
 
-# ²ñ¼ÒÀâÌÀ²ñ
+# ä¼šç¤¾èª¬æ˜ä¼š
 class BriefingSession < MyNavi
   def base_url
     "http://job.mynavi.jp/11/pc/NSSearchSeminarInfo.do?optNum=4pgO7C&corpId=75729"
