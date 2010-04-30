@@ -10,13 +10,18 @@ require 'yaml'
 require 'parsedate'
 require "kconv"
 require File.dirname(__FILE__) + '/twitter_oauth'
+require File.dirname(__FILE__) + '/shorten_url'
 
 # Usage:
 #  1. このファイルと同じディレクトリに以下2つのファイルを設置します。
 #   * twitter_oauth.rb
-#   * http://github.com/japanrock/TwitterTools/blob/master/twitter_oauth.rb
+#    * http://github.com/japanrock/TwitterTools/blob/master/twitter_oauth.rb
 #   * sercret_key.yml
-#   * http://github.com/japanrock/TwitterTools/blob/master/secret_keys.yml.example
+#    * http://github.com/japanrock/TwitterTools/blob/master/secret_keys.yml.example
+#  * shorten_url.rb
+#   * http://github.com/japanrock/TwitterTools/blob/master/shorten_url.rb
+#  * bit_ly_api_key.yml
+#   * http://github.com/japanrock/TwitterTools/blob/master/bit_ly_api_key.yml
 #  2. このファイルを実行します。
 #   ruby lr_recruit_twitter.rb
 
@@ -103,9 +108,16 @@ end
 
 twitter_oauth    = TwitterOauth.new
 briefing_session = BriefingSession.new
+shorten_url      = ShortenURL.new
+
 briefing_session.feed
 briefing_session.filter
 
 briefing_session.dates.each_with_index do |date, index|
-  twitter_oauth.post("#{briefing_session.title}" + " " + "#{briefing_session.dates[index]}" + " " + "#{briefing_session.times[index]}" + " " + "#{briefing_session.link}")
+  # URL短縮
+  url = briefing_session.link
+  shorten_url.get_short_url(url)
+  short_url = shorten_url.short_url
+
+  twitter_oauth.post("#{briefing_session.title}" + " " + "#{briefing_session.dates[index]}" + " " + "#{briefing_session.times[index]}" + " " + "#{short_url}")
 end
