@@ -101,6 +101,10 @@ class BriefingSession < MyNavi
     "http://job.mynavi.jp/11/pc/NSSearchSeminarInfo.do?optNum=4pgO7C&corpId=75729"
   end
 
+  def short_url
+    "http://bit.ly/9vKbom"
+  end
+
   def link
     base_url
   end
@@ -114,10 +118,5 @@ briefing_session.feed
 briefing_session.filter
 
 briefing_session.dates.each_with_index do |date, index|
-  # URL短縮
-  url = briefing_session.link
-  shorten_url.get_short_url(url)
-  short_url = shorten_url.short_url
-
-  twitter_oauth.post("#{briefing_session.title}" + " " + "#{briefing_session.dates[index]}" + " " + "#{briefing_session.times[index]}" + " " + "#{short_url}")
+  twitter_oauth.post("#{briefing_session.title}" + " " + "#{briefing_session.dates[index]}" + " " + "#{briefing_session.times[index]}" + " " + "#{briefing_session.short_url}")
 end
